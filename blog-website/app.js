@@ -1,13 +1,16 @@
+// process:
+// create.ejs sends a POST request 
+// middleware parses the request and turns it into an object
+// GET request to display our data
+
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 
-// import blog model
-const Blog = require('./models/blog'); 
-const { render } = require('ejs');
+// IMPORT FILE WITH BLOG ROUTES
+const blogRoutes = require('./routes/blogRoutes')
 
 // CREATE EXPRESS APP
-// invoking the function stored in "express" to create an instance of an express app
 const app = express();
 
 // CONNECT TO MONGODB
@@ -26,11 +29,10 @@ app.use(express.static('public')); // by adding this, anything in the folder "pu
 // MIDDLEWARE
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true})); // parses the request and turns it into an object
-// app.use((req, res, next) => {
-//   res.locals.path = req.path;
-//   next();
-// });
-
+app.use((req, res, next) => {
+    res.locals.path = req.path;
+    next();
+  });
 
 // ROUTES
 // responding in express
@@ -42,62 +44,12 @@ app.get('/about', (req, res) => {
     res.render('about', {title: 'About'});
 });
 
-app.get('/blogs', (req, res) => {
-    Blog.find().sort({ createdAt: -1})
-        .then((result) => {
-            res.render('index', { title: 'All Blogs', blogs: result})
-        })
-        .catch((err) => {
-            console.log(err);
-        })
-})
-
-app.post('/blogs', (req, res) => {
-    const blog = new Blog(req.body); // create new object
-
-    blog.save()
-        .then((result) => {
-            res.redirect('/blogs'); // redirect back to "all blogs" after submitting new blog
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-})
-
-app.get('/blogs/:id', (req, res) => {
-    const id = req.params.id;
-    Blog.findById(id)
-        .then(result => {
-            res.render('details', {blog: result, title: 'Blog Details'})
-        })
-        .catch(err => {
-            console.log(err);
-        })
-})
-
-app.delete('/blogs/:id', (req, res) => {
-    const id = req.params.id;
-
-    Blog.findByIdAndDelete(id)
-        .then(result => {
-            res.json({redirect: '/blogs'});
-        })
-        .catch(err => {
-            console.log(err);
-        })
-})
-
-app.get('/blogs/create', (req, res) => {
-    res.render('create', {title: 'Create'});
-})
+// blog routes
+app.use('/blogs', blogRoutes);
 
 // 404 page
 app.use((req, res) => { 
     res.status(404).render('404', {title: '404'});
 
-})
+});
 
-// process:
-// create.ejs sends a POST request 
-// middleware parses the request and turns it into an object
-// GET request to display our data
