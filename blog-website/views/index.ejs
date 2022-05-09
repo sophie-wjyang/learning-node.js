@@ -11,12 +11,14 @@
 
         <!-- we use the ejs tags <% %> when we need to access a dynamic object -->
  
-        <!-- if there are previous blogs -->
         <% if(blogs.length > 0){ %> 
             <!-- we output the header and text for each blog -->
             <% blogs.forEach(blog => { %> 
-                <h3 class="title"><%= blog.title %></h3>
-                <p class="snippet"><%= blog.snippet %></p>
+                <!-- link to individual blogs -->
+                <a class="single" href="/blogs/<%= blog._id %>">  
+                    <h3 class="title"><%= blog.title %></h3>
+                    <p class="snippet"><%= blog.snippet %></p>
+                </a>
             <% }) %>
         <% } else{ %>
             <p>There are no blogs to display.</p> 
