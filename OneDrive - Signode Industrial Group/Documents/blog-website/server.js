@@ -1,8 +1,19 @@
 const fs = require('fs');
 const http = require('http');
+const _ = require('lodash');
 
 const server = http.createServer((req, res) => { 
-    console.log(req.url, req.method); 
+
+    // LODASH METHODS
+    const num = _.random(0,20);
+    console.log(num);
+
+    const greet = _.once(() => {
+        console.log('welcome!');
+    });
+
+    greet();
+
     
     // function for the content type being sent back to the browser
     res.setHeader('Content-Type', 'text/html');
